@@ -19,40 +19,59 @@
         .iv-line { width: 20px; border-top: 2px solid #cbd5e1; margin-left: auto; margin-right: 10px; }
         .iv-tube { width: 6px; height: 60px; background-color: #e2e8f0; margin: 0 auto; }
         .glass-card { background: rgba(255, 255, 255, 0.95); border-radius: 16px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border: 1px solid rgba(255, 255, 255, 0.3); }
+        
+        /* تأثير النبض للاتصال */
+        .pulse-active { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen p-6">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto space-y-6">
-        <header class="glass-card p-6 flex items-center justify-between">
+        <header class="glass-card p-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-4">
                 <div class="bg-blue-50 p-4 rounded-xl text-blue-600">
-                    <i class="fa-solid fa-flask text-3xl"></i>
+                    <i class="fa-solid fa-truck-medical text-3xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Smart IV Fluid Monitoring System</h1>
-                    <p class="text-slate-500 text-sm">Real-time Wireless Telemetry via ESP32 BLE Link</p>
-                    <p class="text-blue-600 text-xs font-semibold mt-1">Supervised by: Dr. Othman Al-Fahad | PSMCHS</p>
+                    <h1 class="text-2xl font-bold text-slate-900">Smart IV Fluid Monitor</h1>
+                    <p class="text-slate-500 text-sm">Medical Device Engineering Project | Real-time BLE Telemetry</p>
+                    <p class="text-blue-600 text-xs font-semibold mt-1">Prince Sultan Military College for Health Sciences (PSMCHS)</p>
                 </div>
+            </div>
+            <div class="text-right hidden md:block">
+                <span class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> System Ready
+                </span>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
             <div class="space-y-6 lg:col-span-1">
                 <div class="glass-card p-6">
-                    <h2 class="text-lg font-semibold mb-2">ESP32 Bluetooth Link</h2>
+                    <h2 class="text-lg font-semibold mb-4 text-slate-800 border-b pb-2">Device Connection</h2>
+                    <p class="text-sm text-slate-500 mb-6">Make sure the ESP32 is powered on and advertising before scanning.</p>
+                    
                     <button id="connectBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
-                        <i class="fa-brands fa-bluetooth"></i> <span id="btnText">Scan & Connect IV Monitor</span>
+                        <i class="fa-brands fa-bluetooth-b text-xl"></i> <span id="btnText">Scan & Connect Monitor</span>
                     </button>
-                    <div id="status" class="mt-3 text-center text-sm font-medium text-slate-400">Disconnected</div>
+                    
+                    <div class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-400 uppercase">Status Log</span>
+                            <i id="statusIcon" class="fa-solid fa-circle-xmark text-slate-300"></i>
+                        </div>
+                        <div id="status" class="text-sm font-medium text-slate-600">Waiting for connection...</div>
+                    </div>
                 </div>
             </div>
 
             <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                
                 <div class="glass-card p-6 flex flex-col items-center justify-center">
-                    <h2 class="text-lg font-semibold w-full text-left mb-6 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-column text-slate-400"></i> IV Fluid Visualization
-                    </h2>
+                    <h2 class="text-lg font-semibold w-full text-left mb-6 text-slate-800 border-b pb-2">Fluid Level</h2>
+                    
                     <div class="iv-container text-center">
                         <div class="iv-bag-top"></div>
                         <div class="iv-bag">
@@ -64,45 +83,53 @@
                         </div>
                         <div class="iv-tube"></div>
                     </div>
-                    <div class="mt-6 text-center">
-                        <p class="text-slate-500 text-sm font-medium">Current Volume</p>
-                        <p class="text-4xl font-bold text-slate-800"><span id="volumeValue">0</span> <span class="text-xl text-slate-400">mL</span></p>
-                        <p class="text-blue-600 font-bold mt-1">Remaining: <span id="percentageValue">0</span>%</p>
+                    
+                    <div class="mt-6 text-center w-full bg-slate-50 rounded-lg p-3 border border-slate-100">
+                        <p class="text-3xl font-bold text-slate-800"><span id="volumeValue">0</span> <span class="text-lg text-slate-500 font-normal">mL</span></p>
+                        <p class="text-blue-600 font-bold mt-1 text-sm">Remaining: <span id="percentageValue">0.0</span>%</p>
                     </div>
                 </div>
 
-                <div class="space-y-6">
-                    <div class="glass-card p-6 border-l-4 border-emerald-400 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Flow Rate</p>
-                            <p class="text-3xl font-bold text-slate-800"><span id="flowRateValue">0.0</span> <span class="text-lg text-slate-500">mL/min</span></p>
+                <div class="space-y-6 flex flex-col justify-center">
+                    
+                    <div class="glass-card p-6 border-l-4 border-emerald-400 flex items-center justify-between relative overflow-hidden">
+                        <div class="z-10">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Drip Flow Rate</p>
+                            <p class="text-4xl font-bold text-slate-800"><span id="flowRateValue">0.0</span> <span class="text-base text-slate-500 font-normal">mL/min</span></p>
                         </div>
-                        <div class="w-12 h-12 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center text-xl">
+                        <div class="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-2xl z-10 shadow-sm border border-emerald-100">
                             <i class="fa-solid fa-droplet"></i>
                         </div>
+                        <i class="fa-solid fa-droplet absolute -right-4 -bottom-4 text-7xl text-emerald-50 opacity-50 z-0"></i>
                     </div>
-                    <div class="glass-card p-6 border-l-4 border-blue-400 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">System Status</p>
-                            <p id="systemStatusText" class="text-xl font-bold text-slate-800">Standby</p>
+
+                    <div class="glass-card p-6 border-l-4 border-blue-400 flex items-center justify-between relative overflow-hidden">
+                        <div class="z-10">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Patient Safety Status</p>
+                            <p id="systemStatusText" class="text-2xl font-bold text-slate-800">Standby</p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-microchip"></i>
+                        <div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-2xl z-10 shadow-sm border border-blue-100">
+                            <i class="fa-solid fa-shield-heart"></i>
                         </div>
+                        <i class="fa-solid fa-shield-heart absolute -right-4 -bottom-4 text-7xl text-blue-50 opacity-50 z-0"></i>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // الـ UUIDs مأخوذة مباشرة من كودك الجديد
         const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
         const CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
 
         let bleDevice, bleServer, bleService, bleCharacteristic;
+        
         const connectBtn = document.getElementById('connectBtn');
         const btnText = document.getElementById('btnText');
         const statusDiv = document.getElementById('status');
+        const statusIcon = document.getElementById('statusIcon');
         const fluidLevelDiv = document.getElementById('fluidLevel');
         const volumeValueSpan = document.getElementById('volumeValue');
         const percentageValueSpan = document.getElementById('percentageValue');
@@ -115,10 +142,11 @@
                 return;
             }
             try {
-                btnText.innerText = "Scanning...";
-                statusDiv.innerText = "Requesting Bluetooth Device...";
+                btnText.innerText = "Scanning nearby devices...";
+                statusDiv.innerText = "Please select 'Smart IV Monitor' from the popup list...";
+                statusIcon.className = "fa-solid fa-spinner fa-spin text-blue-500";
                 
-                // التعديل الجذري: إجبار المتصفح على عرض جميع الأجهزة المحيطة
+                // استخدام acceptAllDevices لكسر حجب المتصفح وإظهار القطعة
                 bleDevice = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
                     optionalServices: [SERVICE_UUID]
@@ -126,34 +154,42 @@
                 
                 bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
-                statusDiv.innerText = "Connecting to Server...";
+                statusDiv.innerText = "Connecting to ESP32 Server...";
                 bleServer = await bleDevice.gatt.connect();
 
-                statusDiv.innerText = "Getting Service...";
+                statusDiv.innerText = "Accessing Medical Service...";
                 bleService = await bleServer.getPrimaryService(SERVICE_UUID);
 
-                statusDiv.innerText = "Getting Characteristic...";
+                statusDiv.innerText = "Initializing Data Stream...";
                 bleCharacteristic = await bleService.getCharacteristic(CHARACTERISTIC_UUID);
 
-                statusDiv.innerText = "Starting Data Stream...";
                 await bleCharacteristic.startNotifications();
                 bleCharacteristic.addEventListener('characteristicvaluechanged', handleNotifications);
 
-                btnText.innerText = "Disconnect";
+                // UI Update for Active Connection
+                btnText.innerText = "Disconnect Monitor";
                 connectBtn.classList.replace('bg-blue-600', 'bg-red-500');
                 connectBtn.classList.replace('hover:bg-blue-700', 'hover:bg-red-600');
-                statusDiv.innerText = "Connected Successfully! (Receiving Live Data)";
-                statusDiv.classList.replace('text-slate-400', 'text-emerald-500');
-                systemStatusText.innerText = "Active & Monitoring";
+                connectBtn.classList.replace('shadow-blue-200', 'shadow-red-200');
+                connectBtn.classList.add('pulse-active');
+                
+                statusDiv.innerText = "Live Telemetry Active. Receiving data...";
+                statusDiv.classList.replace('text-slate-600', 'text-emerald-600');
+                statusIcon.className = "fa-solid fa-circle-check text-emerald-500";
+                systemStatusText.innerText = "Monitoring Optimal";
+                systemStatusText.classList.replace('text-slate-800', 'text-emerald-600');
 
             } catch (error) {
                 console.error(error);
-                btnText.innerText = "Scan & Connect IV Monitor";
-                statusDiv.innerText = "Connection Failed: " + error.message;
+                btnText.innerText = "Scan & Connect Monitor";
+                statusDiv.innerText = "Connection Failed. Please reset ESP32 and try again.";
+                statusIcon.className = "fa-solid fa-triangle-exclamation text-red-500";
             }
         });
 
         function handleNotifications(event) {
+            // فك تشفير البيانات القادمة من الـ ESP32 
+            // الكود يرسل: currentVolume, percentage, flowRate
             const value = new TextDecoder('utf-8').decode(event.target.value);
             const dataArray = value.split(',');
 
@@ -162,30 +198,52 @@
                 const percentage = parseFloat(dataArray[1]).toFixed(1);
                 const flowRate = parseFloat(dataArray[2]).toFixed(1);
 
+                // تحديث الأرقام في الشاشة
                 volumeValueSpan.innerText = currentVolume;
                 percentageValueSpan.innerText = percentage;
                 flowRateValueSpan.innerText = flowRate;
 
+                // تحريك السائل الأزرق في الكيس
                 fluidLevelDiv.style.height = percentage + '%';
                 
-                if(percentage <= 20.0) {
+                // تنبيهات الأمان (أقل من 20% يتحول للأحمر)
+                if(percentage <= 20.0 && percentage > 0) {
                     fluidLevelDiv.style.background = 'linear-gradient(180deg, #f87171 0%, #ef4444 100%)';
+                    systemStatusText.innerText = "Low Fluid Warning!";
+                    systemStatusText.classList.replace('text-emerald-600', 'text-red-500');
+                } else if (percentage == 0) {
+                     fluidLevelDiv.style.background = 'linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%)';
+                     systemStatusText.innerText = "Empty / Standby";
+                     systemStatusText.classList.replace('text-red-500', 'text-slate-800');
+                     systemStatusText.classList.replace('text-emerald-600', 'text-slate-800');
                 } else {
                     fluidLevelDiv.style.background = 'linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%)';
+                    systemStatusText.innerText = "Monitoring Optimal";
+                    systemStatusText.classList.replace('text-red-500', 'text-emerald-600');
+                    systemStatusText.classList.replace('text-slate-800', 'text-emerald-600');
                 }
             }
         }
 
         function onDisconnected() {
-            btnText.innerText = "Scan & Connect IV Monitor";
+            btnText.innerText = "Scan & Connect Monitor";
             connectBtn.classList.replace('bg-red-500', 'bg-blue-600');
             connectBtn.classList.replace('hover:bg-red-600', 'hover:bg-blue-700');
-            statusDiv.innerText = "Device Disconnected";
-            statusDiv.classList.replace('text-emerald-500', 'text-slate-400');
+            connectBtn.classList.replace('shadow-red-200', 'shadow-blue-200');
+            connectBtn.classList.remove('pulse-active');
+            
+            statusDiv.innerText = "Device Disconnected. Ready to scan.";
+            statusDiv.classList.replace('text-emerald-600', 'text-slate-600');
+            statusIcon.className = "fa-solid fa-link-slash text-slate-400";
+            
             systemStatusText.innerText = "Standby";
+            systemStatusText.classList.replace('text-emerald-600', 'text-slate-800');
+            systemStatusText.classList.replace('text-red-500', 'text-slate-800');
+            
+            // تصفير العدادات
             fluidLevelDiv.style.height = '0%';
             volumeValueSpan.innerText = '0';
-            percentageValueSpan.innerText = '0';
+            percentageValueSpan.innerText = '0.0';
             flowRateValueSpan.innerText = '0.0';
         }
     </script>
