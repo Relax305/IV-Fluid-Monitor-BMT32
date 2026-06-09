@@ -13,20 +13,9 @@
             background-color: #f8fafc; overflow: hidden; margin: 0 auto;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
         }
-        .iv-bag-top {
-            width: 30px; height: 30px; border: 4px solid #e2e8f0;
-            border-radius: 50%; margin: 0 auto -4px auto; background: white;
-        }
-        .iv-fluid {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
-            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
-            transition: height 1s ease-in-out, background 0.5s ease; opacity: 0.85;
-        }
-        .iv-lines {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: space-between;
-            padding: 20px 0; pointer-events: none; z-index: 10;
-        }
+        .iv-bag-top { width: 30px; height: 30px; border: 4px solid #e2e8f0; border-radius: 50%; margin: 0 auto -4px auto; background: white; }
+        .iv-fluid { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); transition: height 1s ease-in-out, background 0.5s ease; opacity: 0.85; }
+        .iv-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; pointer-events: none; z-index: 10; }
         .iv-line { width: 20px; border-top: 2px solid #cbd5e1; margin-left: auto; margin-right: 10px; }
         .iv-tube { width: 6px; height: 60px; background-color: #e2e8f0; margin: 0 auto; }
         .glass-card { background: rgba(255, 255, 255, 0.95); border-radius: 16px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border: 1px solid rgba(255, 255, 255, 0.3); }
@@ -107,7 +96,6 @@
     </div>
 
     <script>
-        // الـ UUIDs متطابقة 100% مع كود الأردوينو الأخير حقك
         const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
         const CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
 
@@ -130,9 +118,12 @@
                 btnText.innerText = "Scanning...";
                 statusDiv.innerText = "Requesting Bluetooth Device...";
                 
+                // التعديل الجذري: إجبار المتصفح على عرض جميع الأجهزة المحيطة
                 bleDevice = await navigator.bluetooth.requestDevice({
-                    filters: [{ services: [SERVICE_UUID] }]
+                    acceptAllDevices: true,
+                    optionalServices: [SERVICE_UUID]
                 });
+                
                 bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
                 statusDiv.innerText = "Connecting to Server...";
@@ -151,25 +142,22 @@
                 btnText.innerText = "Disconnect";
                 connectBtn.classList.replace('bg-blue-600', 'bg-red-500');
                 connectBtn.classList.replace('hover:bg-blue-700', 'hover:bg-red-600');
-                statusDiv.innerText = "Connected Successfully! (Waiting for data...)";
+                statusDiv.innerText = "Connected Successfully! (Receiving Live Data)";
                 statusDiv.classList.replace('text-slate-400', 'text-emerald-500');
                 systemStatusText.innerText = "Active & Monitoring";
 
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 btnText.innerText = "Scan & Connect IV Monitor";
-                statusDiv.innerText = "Connection Failed.";
+                statusDiv.innerText = "Connection Failed: " + error.message;
             }
         });
 
         function handleNotifications(event) {
-            const value = new TextDecoder().decode(event.target.value);
-            // الكود في الأردوينو يرسل: volume,percentage,flowRate
+            const value = new TextDecoder('utf-8').decode(event.target.value);
             const dataArray = value.split(',');
 
             if (dataArray.length === 3) {
-                statusDiv.innerText = "Receiving Live Data...";
-                
                 const currentVolume = parseFloat(dataArray[0]).toFixed(0);
                 const percentage = parseFloat(dataArray[1]).toFixed(1);
                 const flowRate = parseFloat(dataArray[2]).toFixed(1);
